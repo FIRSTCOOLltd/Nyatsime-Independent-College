@@ -133,7 +133,12 @@ def _seed_demo(c):
 
 # ── INPUT VALIDATION ──────────────────────────────────────────────────────────
 def validate_email(email):
+    """Accept any valid email for staff, Gmail only for learners"""
     return bool(re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', str(email)))
+
+def validate_gmail(email):
+    """Learner registration requires Gmail"""
+    return bool(re.match(r'^[a-zA-Z0-9._%+\-]+@gmail\.com$', str(email).strip().lower()))
 
 def validate_score(score, max_score):
     try:
@@ -448,8 +453,8 @@ class Handler(BaseHTTPRequestHandler):
             first = str(body.get('first_name', '')).strip()
             last  = str(body.get('last_name', '')).strip()
             pw    = str(body.get('password', ''))
-            if not validate_email(email):
-                send_error(self, 'Invalid email', 400); return
+            if not validate_gmail(email):
+                send_error(self, 'Please use a Gmail address (@gmail.com) to register.', 400); return
             if not validate_string(first) or not validate_string(last):
                 send_error(self, 'Name required', 400); return
             if len(pw) < 6:
